@@ -1,4 +1,4 @@
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config(); //hide DBpass
 const express = require("express");
 const cors = require("cors");
@@ -33,6 +33,25 @@ async function run() {
 
       // send data to DB
       const result = await taskCollection.insertOne(newTask);
+      res.send(result);
+    });
+    //read or get specific task blogs by id
+    app.get("/tasks", async (req, res) => {
+      let query = {};
+      // condition for show task based on current user
+      if (req.query?.email) {
+        query = { email: req.query.email };
+      }
+      const result = await taskCollection.find(query).toArray();
+      res.send(result);
+    });
+    // delete task by specific id
+    app.delete("/tasks/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+
+      // send data to DB
+      const result = await taskCollection.deleteOne(query);
       res.send(result);
     });
 
