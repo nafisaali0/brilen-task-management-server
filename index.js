@@ -54,6 +54,29 @@ async function run() {
       const result = await taskCollection.deleteOne(query);
       res.send(result);
     });
+    // update blog info by client response
+    app.put("/tasks/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updatedTaskInfo = req.body;
+      const updatedTask = {
+        $set: {
+          title: updatedTaskInfo.title,
+          task: updatedTaskInfo.task,
+          owner_name: updatedTaskInfo.owner_name,
+          owner_image: updatedTaskInfo.owner_image,
+          date: updatedTaskInfo.date,
+          email: updatedTaskInfo.email,
+        },
+      };
+      const result = await taskCollection.updateOne(
+        filter,
+        updatedTask,
+        options
+      );
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
